@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "omarchy-zen-live-theme",
+  "version": "1.0.0",
+  "description": "Live-applies omarchy theme colors to Firefox/Zen Browser",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "omarchy-zen-theme@local"
+    }
+  },
+  "permissions": [
+    "theme",
+    "file:///tmp/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  }
+}
