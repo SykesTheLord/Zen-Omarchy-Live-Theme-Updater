@@ -24,6 +24,7 @@ chmod +x autoconfig-auto.sh
 ```
 
 When asked:
+
 - Choose **Install**
 - Select **`/opt/zen-browser-bin`** as the browser
 - Select your Zen profile (found under `~/.config/zen/`)
@@ -45,7 +46,7 @@ Restart Zen Browser. It will now update automatically on every theme switch.
 
 ### Step 1: Install from the Firefox Add-ons store
 
-Install **omarchy-zen-live-theme** directly from the Firefox Add-ons store — no manual download needed.
+Install **Zen live updater for Omarchy** directly from the Firefox Add-ons store — no manual download needed.
 
 ### Step 2: Alternatively, install manually
 
@@ -104,12 +105,14 @@ From here, switching themes with `omarchy theme set <name>` will automatically u
 ## Updating
 
 **If you edit the script** — copy it back and restart Zen:
+
 ```bash
 PROFILE=$(ls ~/.config/zen/ | grep -v profiles.ini | grep -v installs.ini | head -1)
 cp omarchy-zen-live-theme.uc.js ~/.config/zen/$PROFILE/chrome/JS/
 ```
 
 **If you edit the extension** — repack and reinstall:
+
 ```bash
 cd extension && zip -r ../omarchy-zen-theme.xpi .
 ```
