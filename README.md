@@ -1,73 +1,20 @@
 # omarchy-zen-live-theme
 
-Live-applies omarchy theme colors to Zen Browser (and Firefox) chrome UI — no browser restart needed after a theme switch.
+Automatically updates your Zen Browser or Firefox colors when you switch omarchy themes — no browser restart needed.
 
-## How it works
+## Which option should I use?
 
-Zen Browser sets its background and accent colors by calling `element.style.setProperty()` on specific DOM elements at startup and on every workspace switch. `userChrome.css` overrides lose this race on workspace switches. This project provides two approaches to fix that, depending on your use case:
+**Option 1 — Script (Zen Browser only):** More accurate color matching, but requires a one-time loader setup. Best if you only use Zen Browser.
 
-| | `.uc.js` script | Firefox extension |
-|---|---|---|
-| Targets Zen's exact CSS variables | Yes | Approximate (via theme API) |
-| Requires fx-autoconfig loader | Yes | No |
-| Publishable on Firefox AMO | No | Yes |
-| Works in standard Firefox | No | Yes |
-
-Both read from a JSON file written by `omarchy-theme-set-zen` on every theme switch, and apply changes within 1.5 seconds.
-
-## Project layout
-
-```
-omarchy-theme-set-zen          # Shell script: writes userChrome.css + zen-colors.json
-omarchy-zen-live-theme.uc.js   # Approach 1: privileged userChrome.js script (Zen-specific)
-extension/
-├── manifest.json              # Approach 2: standard Firefox add-on (AMO-publishable)
-└── background.js
-```
+**Option 2 — Extension (Firefox & Zen):** Easier to install, works in any Firefox-based browser, and can be installed from the Firefox Add-ons store. Colors may not match as precisely in Zen.
 
 ---
 
-## Shared setup (both approaches)
+## Option 1 — Script
 
-### 1. Install the shell script
+### Step 1: Install the loader (one time only)
 
-```bash
-cp omarchy-theme-set-zen ~/.scripts/omarchy-theme-set-zen
-chmod +x ~/.scripts/omarchy-theme-set-zen
-```
-
-### 2. Set up the Omarchy hook
-
-Omarchy calls `omarchy-hook theme-set` at the end of every `omarchy theme set` invocation. This hook runs the zen script automatically on every theme switch:
-
-```bash
-mkdir -p ~/.config/omarchy/hooks/theme-set.d
-```
-
-Create `~/.config/omarchy/hooks/theme-set.d/zen`:
-
-```bash
-#!/bin/bash
-~/.scripts/omarchy-theme-set-zen
-```
-
-```bash
-chmod +x ~/.config/omarchy/hooks/theme-set.d/zen
-```
-
-### 3. Seed the initial colors file
-
-```bash
-~/.scripts/omarchy-theme-set-zen
-```
-
----
-
-## Approach 1 — `.uc.js` script (recommended for Zen Browser)
-
-Sets Zen's exact inline CSS variables directly. More precise than the extension approach, but requires the fx-autoconfig loader and cannot be distributed on AMO.
-
-### Install fx-autoconfig
+The script needs a loader called fx-autoconfig to run inside Zen. Run this once:
 
 ```bash
 git clone https://github.com/MrOtherGuy/fx-autoconfig.git /tmp/fx-autoconfig
@@ -76,62 +23,94 @@ chmod +x autoconfig-auto.sh
 ./autoconfig-auto.sh
 ```
 
-When prompted: choose **Install**, select `/opt/zen-browser-bin` as the browser, and select your active Zen profile (`~/.config/zen/<profile>/`).
+When asked:
+- Choose **Install**
+- Select **`/opt/zen-browser-bin`** as the browser
+- Select your Zen profile (found under `~/.config/zen/`)
 
-Restart Zen and confirm it worked by opening the Browser Console (`Ctrl+Shift+J`) — you should see `USERCHROME.JS TEST - MANAGER WORKING!`.
+Restart Zen Browser to finish.
 
-### Install the script
+### Step 2: Install the script
 
 ```bash
 PROFILE=$(ls ~/.config/zen/ | grep -v profiles.ini | grep -v installs.ini | head -1)
 cp omarchy-zen-live-theme.uc.js ~/.config/zen/$PROFILE/chrome/JS/
 ```
 
-Restart Zen. The script begins polling immediately.
+Restart Zen Browser. It will now update automatically on every theme switch.
 
 ---
 
-## Approach 2 — Firefox extension (AMO-publishable)
+## Option 2 — Extension
 
-Uses the standard `browser.theme` API to apply colors. Works in both Firefox and Zen Browser, and can be submitted to [addons.mozilla.org](https://addons.mozilla.org). Colors are applied via Firefox's theme system rather than Zen's internal CSS variables, so coverage may differ slightly in Zen.
-
-### Pack the extension
+### Step 1: Pack the extension
 
 ```bash
-cd extension
-zip -r /tmp/omarchy-zen-theme.xpi .
+cd extension && zip -r ../omarchy-zen-theme.xpi .
 ```
 
-### Install locally
+### Step 2: Install it
 
-In Firefox or Zen: `about:addons` → gear icon → **Install Add-on From File** → select `/tmp/omarchy-zen-theme.xpi`.
+In Firefox or Zen: open `about:addons` → click the gear icon → **Install Add-on From File** → select `omarchy-zen-theme.xpi`.
 
-To allow unsigned local installation, add to the profile's `user.js`:
+> To install an unsigned extension, add this line to your browser profile's `user.js` file and restart the browser first:
+> ```
+> user_pref("xpinstall.signatures.required", false);
+> ```
 
+---
+
+## Connecting it to omarchy theme switching
+
+Both options need this step so your browser colors update automatically whenever you run `omarchy theme set`.
+
+### Step 1: Install the helper script
+
+```bash
+cp omarchy-theme-set-zen ~/.scripts/omarchy-theme-set-zen
+chmod +x ~/.scripts/omarchy-theme-set-zen
 ```
-user_pref("xpinstall.signatures.required", false);
+
+### Step 2: Create the hook
+
+```bash
+mkdir -p ~/.config/omarchy/hooks/theme-set.d
 ```
 
-### Submit to AMO
+Create a file at `~/.config/omarchy/hooks/theme-set.d/zen` with this content:
 
-Upload the `.xpi` at [addons.mozilla.org/developers](https://addons.mozilla.org/en-US/developers/). The extension uses only standard `theme` and `file:///tmp/*` permissions and requires no privileged APIs.
+```bash
+#!/bin/bash
+~/.scripts/omarchy-theme-set-zen
+```
+
+Then make it executable:
+
+```bash
+chmod +x ~/.config/omarchy/hooks/theme-set.d/zen
+```
+
+### Step 3: Apply your current theme
+
+Run this once to sync your current theme colors to the browser:
+
+```bash
+~/.scripts/omarchy-theme-set-zen
+```
+
+From here, switching themes with `omarchy theme set <name>` will automatically update your browser colors within a couple of seconds.
 
 ---
 
 ## Updating
 
-**Script changes** — copy back to `~/.scripts/`, no restart needed:
-```bash
-cp omarchy-theme-set-zen ~/.scripts/omarchy-theme-set-zen
-```
-
-**`.uc.js` changes** — copy to `chrome/JS/` and restart Zen:
+**If you edit the script** — copy it back and restart Zen:
 ```bash
 PROFILE=$(ls ~/.config/zen/ | grep -v profiles.ini | grep -v installs.ini | head -1)
 cp omarchy-zen-live-theme.uc.js ~/.config/zen/$PROFILE/chrome/JS/
 ```
 
-**Extension changes** — repack and reinstall:
+**If you edit the extension** — repack and reinstall:
 ```bash
-cd extension && zip -r /tmp/omarchy-zen-theme.xpi .
+cd extension && zip -r ../omarchy-zen-theme.xpi .
 ```
