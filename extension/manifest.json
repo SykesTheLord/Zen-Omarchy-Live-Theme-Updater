@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "omarchy-zen-live-theme",
   "version": "1.0.0",
-  "description": "Live-applies omarchy theme colors to Firefox/Zen Browser",
+  "description": "Automatically updates your browser colors when you switch omarchy themes. Changes apply within seconds — no restart needed.",
   "browser_specific_settings": {
     "gecko": {
       "id": "omarchy-zen-theme@local",
