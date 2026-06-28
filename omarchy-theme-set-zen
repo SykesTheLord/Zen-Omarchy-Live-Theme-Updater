@@ -74,8 +74,9 @@ EOF
     echo "omarchy-theme-set-zen: updated $(basename "$profile_path") → $CHROME_DIR/userChrome.css"
 done < <(grep "^Path=" "$PROFILES_INI" | cut -d= -f2-)
 
-# Write JSON for the live-theme extension
+# Write JSON for the live-theme extension (profile path + /tmp for the Firefox add-on)
 ZEN_COLORS_JSON="$HOME/.config/omarchy/current/theme/zen-colors.json"
+TMP_COLORS_JSON="/tmp/omarchy-zen-colors.json"
 cat > "$ZEN_COLORS_JSON" << EOF
 {
   "background": "${BG_HEX}",
@@ -84,6 +85,7 @@ cat > "$ZEN_COLORS_JSON" << EOF
   "theme": "${THEME_NAME}"
 }
 EOF
-echo "omarchy-theme-set-zen: wrote $ZEN_COLORS_JSON"
+cp "$ZEN_COLORS_JSON" "$TMP_COLORS_JSON"
+echo "omarchy-theme-set-zen: wrote $ZEN_COLORS_JSON and $TMP_COLORS_JSON"
 
 echo "omarchy-theme-set-zen: restart Zen Browser to apply"
