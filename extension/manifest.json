@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "omarchy-zen-live-theme",
+  "version": "1.0.0",
+  "description": "Live-applies omarchy theme colors to Zen Browser chrome",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "omarchy-zen-theme@local"
+    }
+  },
+  "permissions": [
+    "experiments.zenTheme"
+  ],
+  "experiment_apis": {
+    "zenTheme": {
+      "schema": "experiments/zenTheme/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "experiments/zenTheme/api.js",
+        "paths": [["zenTheme"]]
+      }
+    }
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  }
+}
