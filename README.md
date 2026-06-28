@@ -43,20 +43,19 @@ Restart Zen Browser. It will now update automatically on every theme switch.
 
 ## Option 2 — Extension
 
-### Step 1: Pack the extension
+### Step 1: Install from the Firefox Add-ons store
+
+Install **omarchy-zen-live-theme** directly from the Firefox Add-ons store — no manual download needed.
+
+### Step 2: Alternatively, install manually
+
+Pack the extension and install it yourself:
 
 ```bash
 cd extension && zip -r ../omarchy-zen-theme.xpi .
 ```
 
-### Step 2: Install it
-
 In Firefox or Zen: open `about:addons` → click the gear icon → **Install Add-on From File** → select `omarchy-zen-theme.xpi`.
-
-> To install an unsigned extension, add this line to your browser profile's `user.js` file and restart the browser first:
-> ```
-> user_pref("xpinstall.signatures.required", false);
-> ```
 
 ---
 
